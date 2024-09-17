@@ -7,10 +7,12 @@ import About from "./pages/About";
 import Home from "./pages/Home";
 import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
     <BrowserRouter>
+      <Toaster />
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
