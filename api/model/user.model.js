@@ -17,6 +17,10 @@ const userSchema = new Schema(
       lowercase: true,
     },
     password: { type: String, required: true, minlength: 6 },
+    avatar: {
+      type: String,
+      default: "https://img.icons8.com/color/48/gender-neutral-user.png",
+    },
   },
   { timestamps: true }
 );

@@ -5,6 +5,7 @@ import { BeatLoader } from "react-spinners";
 import { useState } from "react";
 
 import toast from "react-hot-toast";
+import OAuth from "../components/modules/OAuth";
 
 const SignIn = () => {
   // ============ Redux ============
@@ -82,6 +83,7 @@ const SignIn = () => {
         >
           {loading ? <BeatLoader color="#b18484" size={8} /> : "Sign In"}
         </button>
+        <OAuth />
         <div className="flex gap-2 mt-5">
           <p>Don&apos;t have an account?</p>
           <Link to="/sign-up">
