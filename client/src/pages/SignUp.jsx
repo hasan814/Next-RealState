@@ -24,19 +24,15 @@ const SignUp = () => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
       const responseData = await response.json();
-
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(responseData.message || "Something went wrong");
-      }
 
       toast.success(responseData.message || "Sign Up successful!");
       navigate("/sign-in");

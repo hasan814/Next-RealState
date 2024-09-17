@@ -1,3 +1,5 @@
+import { signInStart, signInFailure, signInSuccess } from "../redux/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { BeatLoader } from "react-spinners";
 import { useState } from "react";
@@ -5,10 +7,16 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 const SignIn = () => {
-  // ============ State ============
+  // ============ Redux ============
+  const { loading, error } = useSelector((state) => state.user);
+
+  // ============ Dispatch ============
+  const dispatch = useDispatch();
+
+  // ============ Navigate ============
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+
+  // ============ State ============
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -21,8 +29,7 @@ const SignIn = () => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    setLoading(true);
-    setError(null);
+    dispatch(signInStart());
 
     try {
       const response = await fetch("/api/auth/signin", {
@@ -33,16 +40,14 @@ const SignIn = () => {
 
       const responseData = await response.json();
 
-      if (!response.ok) {
-        throw new Error(responseData.message || "Something went wrong");
-      }
+      if (!response.ok)
+        throw new Error(responseData.message || "Sign in failed.");
 
+      dispatch(signInSuccess(responseData));
       toast.success(responseData.message || "Sign In successful!");
       navigate("/");
     } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -75,11 +80,11 @@ const SignIn = () => {
           disabled={loading}
           className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
         >
-          {loading ? <BeatLoader color="#b18484" size={8} /> : "Sign Up"}
+          {loading ? <BeatLoader color="#b18484" size={8} /> : "Sign In"}
         </button>
         <div className="flex gap-2 mt-5">
-          <p>Don&apos;t Have an account?</p>
-          <Link to="/sign-in">
+          <p>Don&apos;t have an account?</p>
+          <Link to="/sign-up">
             <span className="text-blue-700">Sign Up</span>
           </Link>
         </div>
