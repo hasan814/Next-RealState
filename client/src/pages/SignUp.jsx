@@ -38,7 +38,7 @@ const SignUp = () => {
         throw new Error(responseData.message || "Something went wrong");
       }
 
-      toast.success(responseData.message || "Signup successful!");
+      toast.success(responseData.message || "Sign Up successful!");
       navigate("/sign-in");
     } catch (error) {
       setError(error.message);
