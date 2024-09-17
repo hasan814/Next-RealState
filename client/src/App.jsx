@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
 import { Toaster } from "react-hot-toast";
+import PrivateRoute from "./components/modules/PrivateRoute";
 
 const App = () => {
   return (
@@ -19,7 +20,9 @@ const App = () => {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/about" element={<About />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/profile" element={<Profile />} />
+        </Route>
       </Routes>
       <Footer />
     </BrowserRouter>

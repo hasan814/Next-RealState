@@ -40,7 +40,6 @@ const OAuth = () => {
       if (!response.ok)
         throw new Error(responseData.message || "Google sign-in failed.");
 
-      console.log(responseData);
       dispatch(signInSuccess(responseData));
       navigate("/");
       toast.success("Signed in successfully!");
