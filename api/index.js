@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import express from "express";
+import cookieParse from "cookie-parser";
 
 import dotenv from "dotenv";
 
@@ -24,6 +25,7 @@ app.listen(3000, () => {
 });
 
 app.use(express.json());
+app.use(cookieParse());
 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
