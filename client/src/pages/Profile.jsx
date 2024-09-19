@@ -1,50 +1,46 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { BeatLoader } from "react-spinners";
+import { app } from "../firebase";
+
+import toast from "react-hot-toast";
+
 import {
   getDownloadURL,
   getStorage,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { app } from "../firebase";
+
+import {
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess,
+} from "../redux/userSlice";
 
 const Profile = () => {
-  // ============ State =================
-  const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    avatar: "",
-  });
-  const [filePercentage, setFilePercentage] = useState(0);
-  const [fileUploadError, setFileUploadError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // ============== Dispatch =============
+  const dispatch = useDispatch();
 
-  // ============ Ref =================
+  // ============== Ref =============
   const fileRef = useRef();
 
-  // ============ Redux =================
-  const { currentUser } = useSelector((state) => state.user);
+  // ============== State =============
+  const [file, setFile] = useState(undefined);
+  const [formData, setFormData] = useState({});
+  const [filePercentage, setFilePercentage] = useState(0);
+  const [fileUploadError, setFileUploadError] = useState(false);
 
-  // ============ Effect =================
-  useEffect(() => {
-    if (currentUser) {
-      setFormData({
-        username: currentUser.username || "",
-        email: currentUser.email || "",
-        avatar: currentUser.avatar || "",
-      });
-    }
-  }, [currentUser]);
+  // ============== Redux =============
+  const { currentUser, loading, error } = useSelector((state) => state.user);
 
+  // ============== Effect =============
   useEffect(() => {
     if (file) uploadFileHandler(file);
   }, [file]);
 
-  // ============ Function =================
-  const uploadFileHandler = (file) => {
-    setLoading(true);
+  // ============== Upload Function =============
+  const uploadFileHandler = useCallback((file) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
     const storageRef = ref(storage, fileName);
@@ -58,9 +54,7 @@ const Profile = () => {
         setFilePercentage(Math.round(progress));
       },
       (error) => {
-        setFileUploadError(true);
-        setLoading(false);
-        console.error("File upload failed:", error);
+        setFileUploadError(error.message);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
@@ -68,31 +62,45 @@ const Profile = () => {
             ...prevData,
             avatar: downloadURL,
           }));
-          setLoading(false);
-          setFileUploadError(false);
+          setFileUploadError(null);
         });
       }
     );
-  };
+  }, []);
 
-  const handleInputChange = (event) => {
+  // ============== Change Handler =============
+  const changeHandler = (event) => {
     const { id, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [id]: value,
-    }));
+    setFormData({ ...formData, [id]: value });
   };
 
-  const handleSubmit = (event) => {
+  // ============== submit Handler =============
+  const submitHandler = async (event) => {
     event.preventDefault();
-    console.log("Form data submitted: ", formData);
+    try {
+      dispatch(updateUserStart());
+      const response = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const responseData = await response.json();
+      if (responseData) {
+        dispatch(updateUserSuccess(responseData.user));
+        toast.success(responseData.message);
+      } else {
+        dispatch(updateUserFailure(responseData.message));
+      }
+    } catch (error) {
+      dispatch(updateUserFailure(error.message));
+    }
   };
 
-  // ============ Rendering =================
+  // ============== Rendering =============
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-4" onSubmit={submitHandler}>
         <input
           hidden
           type="file"
@@ -106,57 +114,57 @@ const Profile = () => {
           src={formData.avatar || currentUser?.avatar}
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
         />
-        <div className="my-3 text-center">
-          {filePercentage > 0 && filePercentage < 100 && (
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              {filePercentage}%
-              <div
-                className="bg-blue-600 h-2.5 rounded-full"
-                style={{ width: `${filePercentage}%` }}
-              ></div>
-            </div>
-          )}
-          {filePercentage === 100 && (
-            <span className="text-white bg-green-500 py-2 rounded-lg px-1">
-              File upload Successfully
+        <p className="text-sm self-center">
+          {fileUploadError ? (
+            <span className="text-red-700">
+              Error Image Upload (image must be less than 2 MB)
             </span>
+          ) : (
+            <>
+              {filePercentage > 0 && filePercentage < 100 ? (
+                <span className="text-slate-700">{`Uploading ${filePercentage}%`}</span>
+              ) : filePercentage === 100 ? (
+                <span className="text-green-700">
+                  Image Successfully Uploaded!
+                </span>
+              ) : (
+                ""
+              )}
+            </>
           )}
-          {fileUploadError && (
-            <span className="text-red-600">File upload failed</span>
-          )}
-        </div>
+        </p>
         <input
           type="text"
           id="username"
-          value={formData.username || ""}
-          onChange={handleInputChange}
           placeholder="Username.."
+          onChange={changeHandler}
+          defaultValue={currentUser.username}
           className="border p-3 rounded-lg"
         />
         <input
-          type="email"
           id="email"
-          value={formData.email || ""}
-          onChange={handleInputChange}
+          type="email"
           placeholder="Email.."
+          onChange={changeHandler}
+          defaultValue={currentUser.email}
           className="border p-3 rounded-lg"
         />
         <input
-          type="password"
           id="password"
-          value={formData.password || ""}
-          onChange={handleInputChange}
+          type="password"
+          onChange={changeHandler}
           placeholder="Password..."
           className="border p-3 rounded-lg"
         />
+
         <button
           type="submit"
           className="uppercase bg-slate-700 text-white rounded-lg p-3 hover:opacity-95 disabled:opacity-80"
-          disabled={loading}
         >
-          {loading ? "Uploading..." : "Update"}
+          {loading ? <BeatLoader color="#a58080" /> : "update"}
         </button>
       </form>
+
       <div className="flex justify-between mt-5">
         <span className="text-red-700 cursor-pointer">Delete Account</span>
         <span className="text-red-700 cursor-pointer">Sign Out</span>

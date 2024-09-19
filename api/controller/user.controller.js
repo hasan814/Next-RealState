@@ -9,34 +9,33 @@ export const test = (req, res) => {
 
 // ================ Update User ==================
 export const updateUser = async (req, res) => {
-  if (req.user.id !== req.params.id)
+  if (req.user.id !== req.params.id) {
     return res
       .status(401)
       .json({ message: "You can only update your own account!" });
+  }
 
   const userId = req.params.id;
-  const { password, ...otherData } = req.body;
 
   try {
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found!" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
+    }
 
-    if (password) {
-      const salt = bcrypt.genSalt(10);
-      const hashedPassword = bcrypt.hashSync(password, salt);
-      otherData.password = hashedPassword;
+    let updatedFields = {
+      username: req.body.username,
+      email: req.body.email,
+      avatar: req.body.avatar,
+    };
+
+    if (req.body.password) {
+      updatedFields.password = bcrypt.hashSync(req.body.password, 10);
     }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      {
-        $set: {
-          username: req.body.username,
-          email: req.body.email,
-          password: req.body.password,
-          avatar: req.body.avatar,
-        },
-      },
+      { $set: updatedFields },
       { new: true }
     );
 
@@ -47,8 +46,9 @@ export const updateUser = async (req, res) => {
       user: rest,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error updating user", error: err.message });
+    res.status(500).json({
+      message: "Error updating user",
+      error: err.message,
+    });
   }
 };
