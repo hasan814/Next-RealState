@@ -9,11 +9,10 @@ export const test = (req, res) => {
 
 // ================ Update User ==================
 export const updateUser = async (req, res) => {
-  if (req.user.id !== req.params.id) {
+  if (req.user.id !== req.params.id)
     return res
       .status(401)
       .json({ message: "You can only update your own account!" });
-  }
 
   const userId = req.params.id;
 
@@ -49,6 +48,32 @@ export const updateUser = async (req, res) => {
     res.status(500).json({
       message: "Error updating user",
       error: err.message,
+    });
+  }
+};
+
+// ================ Delete User ==================
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id) {
+    return res
+      .status(401)
+      .json({ message: "You can only delete your own account!" });
+  }
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    res.clearCookie("access_token");
+    res.status(200).json({ message: "User deleted successfully!" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting user",
+      error: error.message,
     });
   }
 };

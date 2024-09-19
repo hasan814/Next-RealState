@@ -13,6 +13,9 @@ import {
 } from "firebase/storage";
 
 import {
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
@@ -96,6 +99,25 @@ const Profile = () => {
     }
   };
 
+  // ============== delete Handler =============
+  const deleteUserHandler = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const response = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const responseData = await response.json();
+      if (responseData) {
+        dispatch(deleteUserSuccess(responseData.user));
+        toast.success(responseData.message);
+      } else {
+        dispatch(updateUserFailure(responseData.message));
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
+
   // ============== Rendering =============
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -166,7 +188,12 @@ const Profile = () => {
       </form>
 
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete Account</span>
+        <span
+          className="text-red-700 cursor-pointer"
+          onClick={deleteUserHandler}
+        >
+          Delete Account
+        </span>
         <span className="text-red-700 cursor-pointer">Sign Out</span>
       </div>
     </div>
