@@ -16,6 +16,9 @@ import {
   deleteUserFailure,
   deleteUserStart,
   deleteUserSuccess,
+  signOutUserFailure,
+  signOutUserStart,
+  signOutUserSuccess,
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
@@ -108,13 +111,31 @@ const Profile = () => {
       });
       const responseData = await response.json();
       if (responseData) {
-        dispatch(deleteUserSuccess(responseData.user));
+        dispatch(deleteUserSuccess(responseData));
         toast.success(responseData.message);
       } else {
         dispatch(updateUserFailure(responseData.message));
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
+    }
+  };
+
+  // ============== Sign Out Handler =============
+  const signOutHandler = async () => {
+    try {
+      dispatch(signOutUserStart());
+      const response = await fetch(`/api/auth/signout`);
+      const responseData = await response.json();
+      console.log(responseData);
+      if (responseData) {
+        dispatch(signOutUserSuccess(responseData));
+        toast.success(responseData.message);
+      } else {
+        dispatch(signOutUserFailure(responseData.message));
+      }
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message));
     }
   };
 
@@ -194,7 +215,9 @@ const Profile = () => {
         >
           Delete Account
         </span>
-        <span className="text-red-700 cursor-pointer">Sign Out</span>
+        <span className="text-red-700 cursor-pointer" onClick={signOutHandler}>
+          Sign Out
+        </span>
       </div>
     </div>
   );

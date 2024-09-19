@@ -129,3 +129,16 @@ export const google = async (req, res) => {
     return res.status(500).json({ message: "Server error, please try again" });
   }
 };
+
+// ================= Sign Out =======================
+export const signout = async (req, res) => {
+  try {
+    res.clearCookie("access_token");
+
+    res.status(200).json({ message: "Signed out successfully!" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error signing out", error: error.message });
+  }
+};
