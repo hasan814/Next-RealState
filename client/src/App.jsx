@@ -9,6 +9,7 @@ import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
 import { Toaster } from "react-hot-toast";
 import PrivateRoute from "./components/modules/PrivateRoute";
+import CreateListing from "./pages/CreateListing";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
+          <Route path="/create-listing" element={<CreateListing />} />
         </Route>
       </Routes>
       <Footer />
