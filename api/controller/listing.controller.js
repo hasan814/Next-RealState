@@ -61,7 +61,6 @@ export const updateListing = async (req, res) => {
       { new: true }
     );
 
-    console.log(updateListing);
     return res
       .status(200)
       .json({ message: "Update Listing Successfully", updatedListing });

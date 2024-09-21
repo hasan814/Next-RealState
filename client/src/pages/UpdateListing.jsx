@@ -127,7 +127,6 @@ const UpdateListing = () => {
       const responseData = await response.json();
       if (!response.ok) setError(responseData);
 
-      console.log(responseData);
       toast.success(responseData.message);
       navigate(`/listing/${responseData.updatedListing._id}`);
     } catch (error) {
