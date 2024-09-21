@@ -96,3 +96,21 @@ export const getUserListings = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+
+// ================ Get User Listing ==================
+export const getUser = async (req, res) => {
+  try {
+    const userId = req.params.id || req.user.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { password: pass, ...rest } = user._doc;
+    res.status(200).json(rest);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};

@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MdLocationOn } from "react-icons/md";
+import { useSelector } from "react-redux";
 import { MoonLoader } from "react-spinners";
 import { Navigation } from "swiper/modules";
 import { GiPriceTag } from "react-icons/gi";
@@ -11,15 +12,20 @@ import { useParams } from "react-router-dom";
 import SwiperCore from "swiper";
 
 import "swiper/css/bundle";
+import Contact from "../components/modules/Contact";
 
 const Listing = () => {
+  // ============ Redux ===============
+  const { currentUser } = useSelector((state) => state.user);
+
   // ============ Swiper ===============
   SwiperCore.use([Navigation]);
 
   // ============ State ===============
+  const [error, setError] = useState(false);
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [contact, setContact] = useState(false);
 
   // ============ Params ===============
   const { listingId } = useParams();
@@ -150,6 +156,15 @@ const Listing = () => {
             <strong>Offer:</strong> {listing.offer ? "Yes" : "No"}
           </p>
         </div>
+        {currentUser && listing.userRef !== currentUser._id && !contact && (
+          <button
+            className="bg-slate-700 w-full my-4 text-white rounded-lg uppercase hover:opacity-95 p-3"
+            onClick={() => setContact(true)}
+          >
+            Contact Landlord
+          </button>
+        )}
+        {contact && <Contact listing={listing} />}
       </div>
     </div>
   );
