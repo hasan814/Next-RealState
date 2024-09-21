@@ -159,6 +159,26 @@ const Profile = () => {
     }
   };
 
+  // ============== Delete Listing =============
+  const deleteListingHandler = async (listingId) => {
+    try {
+      const response = await fetch(`/api/listing/delete/${listingId}`, {
+        method: "DELETE",
+      });
+      const responseData = await response.json();
+      if (!response.ok) {
+        toast.error(responseData.message);
+        return;
+      }
+      setUserListings((prev) =>
+        prev.filter((listing) => listing._id !== listingId)
+      );
+      toast.success(responseData.message);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // ============== Rendering =============
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -275,7 +295,12 @@ const Profile = () => {
                 <p>{listing.name}</p>
               </Link>
               <div className="flex flex-col items-center">
-                <button className="text-red-700 uppercase">Delete</button>
+                <button
+                  className="text-red-700 uppercase"
+                  onClick={() => deleteListingHandler(listing._id)}
+                >
+                  Delete
+                </button>
                 <button className="text-green-700 uppercase">Edit</button>
               </div>
             </div>
