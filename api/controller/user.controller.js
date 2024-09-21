@@ -81,14 +81,18 @@ export const deleteUser = async (req, res, next) => {
 
 // ================ Get User Listing ==================
 export const getUserListings = async (req, res) => {
-  if (req.user.id !== req.params.id) {
-    try {
+  try {
+    if (req.user.id === req.params.id) {
       const listings = await Listing.find({ userRef: req.params.id });
       return res.status(200).json(listings);
-    } catch (error) {}
-  } else {
+    } else {
+      return res
+        .status(403)
+        .json({ message: "You can only view your own listings!" });
+    }
+  } catch (error) {
     return res
-      .status(401)
-      .json({ message: "You can only view your own listings!" });
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
