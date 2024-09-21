@@ -57,11 +57,31 @@ export const updateListing = async (req, res) => {
 
     const updatedListing = await Listing.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
-      { new: true, runValidators: true }
+      req.body,
+      { new: true }
     );
 
-    return res.status(200).json(updatedListing);
+    console.log(updateListing);
+    return res
+      .status(200)
+      .json({ message: "Update Listing Successfully", updatedListing });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+// ================ Get ==================
+export const getListing = async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+
+    if (!listing) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+
+    return res.status(200).json(listing);
   } catch (error) {
     return res
       .status(500)

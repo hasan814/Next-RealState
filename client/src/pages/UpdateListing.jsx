@@ -1,8 +1,8 @@
+import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { BeatLoader } from "react-spinners";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { app } from "../firebase";
 
 import toast from "react-hot-toast";
@@ -14,7 +14,10 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 
-const CreateListing = () => {
+const UpdateListing = () => {
+  // ============= Params =============
+  const params = useParams();
+
   // ============= Navigate =============
   const navigate = useNavigate();
 
@@ -115,36 +118,49 @@ const CreateListing = () => {
       setLoading(true);
       setError(false);
 
-      const response = await fetch("/api/listing/create", {
+      const response = await fetch(`/api/listing/update/${params.listingId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, userRef: currentUser._id }),
       });
 
       const responseData = await response.json();
+      if (!response.ok) setError(responseData);
 
-      if (!response.ok) {
-        setError(responseData.message);
-        toast.error(responseData.message);
-      }
+      console.log(responseData);
       toast.success(responseData.message);
-      navigate(`/listing/${responseData._id}`);
+      navigate(`/listing/${responseData.updatedListing._id}`);
     } catch (error) {
       console.log(error);
-      setError("An error occurred while creating the listing.");
+      setError("An error occurred while upadting the listing.");
       setLoading(false);
     }
   };
+
+  // ================= Effect =================
+  useEffect(() => {
+    const fetchData = async () => {
+      const listingId = params.listingId;
+      const response = await fetch(`/api/listing/get/${listingId}`);
+      const responseData = await response.json();
+      if (!response.ok) {
+        toast.error(responseData.message);
+        return;
+      }
+      setFormData(responseData);
+    };
+    fetchData();
+  }, [params.listingId]);
 
   // ================= Rendering =================
   return (
     <main className="mx-auto p-6 max-w-4xl shadow-lg rounded-lg my-10">
       <h1 className="text-4xl font-bold text-center my-8 text-blue-600">
-        Create a Listing
+        Update a Listing
       </h1>
       <form
-        className="flex flex-col gap-8 sm:flex-row"
         onSubmit={submitHandler}
+        className="flex flex-col gap-8 sm:flex-row"
       >
         <div className="flex-1 flex flex-col gap-6">
           <label className="block font-medium text-gray-700">Name</label>
@@ -354,11 +370,11 @@ const CreateListing = () => {
           </div>
           <div className="text-center mt-8">
             <button
-              disabled={loading || uploading}
               type="submit"
+              disabled={loading || uploading}
               className="bg-blue-600 w-full text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all"
             >
-              {loading ? <BeatLoader color="#a58080" /> : "Create Listing"}
+              {loading ? <BeatLoader color="#a58080" /> : "Update Listing"}
             </button>
             {error && <p className="text-red-700 text-sm">{error}</p>}
           </div>
@@ -368,4 +384,4 @@ const CreateListing = () => {
   );
 };
 
-export default CreateListing;
+export default UpdateListing;
