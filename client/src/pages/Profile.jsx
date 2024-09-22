@@ -130,7 +130,6 @@ const Profile = () => {
       dispatch(signOutUserStart());
       const response = await fetch(`/api/auth/signout`);
       const responseData = await response.json();
-      console.log(responseData);
       if (responseData) {
         dispatch(signOutUserSuccess(responseData));
         toast.success(responseData.message);
