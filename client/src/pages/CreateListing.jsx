@@ -128,7 +128,8 @@ const CreateListing = () => {
         toast.error(responseData.message);
       }
       toast.success(responseData.message);
-      navigate(`/listing/${responseData._id}`);
+      setLoading(false);
+      navigate(`/listing/${responseData.listing._id}`);
     } catch (error) {
       console.log(error);
       setError("An error occurred while creating the listing.");
