@@ -63,7 +63,7 @@ const SignIn = () => {
   // ============== Rendering ==============
   return (
     <motion.div
-      className="p-3 max-w-lg mx-auto"
+      className="p-3 max-w-lg mx-auto mb-11"
       initial="hidden"
       animate="visible"
       transition={{ staggerChildren: 0.2 }}
