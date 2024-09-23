@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BeatLoader } from "react-spinners";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { app } from "../firebase";
 
@@ -26,29 +27,27 @@ import {
 } from "../redux/userSlice";
 
 const Profile = () => {
-  // ============== Dispatch =============
+  // ============== Dispatch =================
   const dispatch = useDispatch();
 
-  // ============== Ref =============
+  // ============== Ref =================
   const fileRef = useRef();
 
-  // ============== State =============
+  // ============== State =================
   const [file, setFile] = useState(undefined);
   const [formData, setFormData] = useState({});
   const [userListings, setUserListings] = useState([]);
   const [filePercentage, setFilePercentage] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [showListingError, setShowListingError] = useState(false);
-
-  // ============== Redux =============
   const { currentUser, loading } = useSelector((state) => state.user);
 
-  // ============== Effect =============
+  // ============== Effect =================
   useEffect(() => {
     if (file) uploadFileHandler(file);
   }, [file]);
 
-  // ============== Upload Function =============
+  // ============== Callback =================
   const uploadFileHandler = useCallback((file) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
@@ -77,13 +76,13 @@ const Profile = () => {
     );
   }, []);
 
-  // ============== Change Handler =============
+  // ============== Chqnge Function =================
   const changeHandler = (event) => {
     const { id, value } = event.target;
     setFormData({ ...formData, [id]: value });
   };
 
-  // ============== submit Handler =============
+  // ============== Submit Function =================
   const submitHandler = async (event) => {
     event.preventDefault();
     try {
@@ -105,7 +104,7 @@ const Profile = () => {
     }
   };
 
-  // ============== delete Handler =============
+  // ============== Delete Function =================
   const deleteUserHandler = async () => {
     try {
       dispatch(deleteUserStart());
@@ -124,7 +123,7 @@ const Profile = () => {
     }
   };
 
-  // ============== Sign Out Handler =============
+  // ============== Sign Function =================
   const signOutHandler = async () => {
     try {
       dispatch(signOutUserStart());
@@ -141,7 +140,6 @@ const Profile = () => {
     }
   };
 
-  // ============== Show Listing Function =============
   const showListingHandler = async () => {
     try {
       setShowListingError(false);
@@ -158,7 +156,7 @@ const Profile = () => {
     }
   };
 
-  // ============== Delete Listing =============
+  // ============== Delete Function =================
   const deleteListingHandler = async (listingId) => {
     try {
       const response = await fetch(`/api/listing/delete/${listingId}`, {
@@ -178,11 +176,37 @@ const Profile = () => {
     }
   };
 
-  // ============== Rendering =============
+  // ============== Motion =================
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
+  const slideUp = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
+
+  // ============== Rendering =================
   return (
-    <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4" onSubmit={submitHandler}>
+    <motion.div
+      className="p-3 max-w-lg mx-auto"
+      initial="hidden"
+      animate="visible"
+      transition={{ staggerChildren: 0.2 }}
+    >
+      <motion.h1
+        className="text-3xl font-semibold text-center my-7"
+        variants={fadeIn}
+        transition={{ duration: 0.8 }}
+      >
+        Profile
+      </motion.h1>
+      <motion.form
+        className="flex flex-col gap-4"
+        onSubmit={submitHandler}
+        variants={fadeIn}
+      >
         <input
           hidden
           type="file"
@@ -190,11 +214,12 @@ const Profile = () => {
           accept="image/*"
           onChange={(event) => setFile(event.target.files[0])}
         />
-        <img
+        <motion.img
           alt="avatar"
           onClick={() => fileRef.current.click()}
           src={formData.avatar || currentUser?.avatar}
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
+          whileHover={{ scale: 1.1 }}
         />
         <p className="text-sm self-center">
           {fileUploadError ? (
@@ -215,43 +240,47 @@ const Profile = () => {
             </>
           )}
         </p>
-        <input
+        <motion.input
           type="text"
           id="username"
           placeholder="Username.."
           onChange={changeHandler}
           defaultValue={currentUser.username}
           className="border p-3 rounded-lg"
+          variants={fadeIn}
         />
-        <input
+        <motion.input
           id="email"
           type="email"
           placeholder="Email.."
           onChange={changeHandler}
           defaultValue={currentUser.email}
           className="border p-3 rounded-lg"
+          variants={fadeIn}
         />
-        <input
+        <motion.input
           id="password"
           type="password"
           onChange={changeHandler}
           placeholder="Password..."
           className="border p-3 rounded-lg"
+          variants={fadeIn}
         />
-
-        <button
+        <motion.button
           type="submit"
           className="uppercase bg-slate-700 text-white rounded-lg p-3 hover:opacity-95 disabled:opacity-80"
+          whileHover={{ scale: 1.05 }}
+          variants={slideUp}
         >
-          {loading ? <BeatLoader color="#a58080" /> : "update"}
-        </button>
+          {loading ? <BeatLoader color="#a58080" /> : "Update"}
+        </motion.button>
         <Link
           to="/create-listing"
           className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95"
         >
           Create List
         </Link>
-      </form>
+      </motion.form>
 
       <div className="flex justify-between mt-5">
         <span
@@ -264,21 +293,31 @@ const Profile = () => {
           Sign Out
         </span>
       </div>
-      <button onClick={showListingHandler} className="text-green-700 w-full">
+
+      <motion.button
+        onClick={showListingHandler}
+        className="text-green-700 w-full"
+        whileHover={{ scale: 1.05 }}
+        variants={fadeIn}
+      >
         Show Listing
-      </button>
+      </motion.button>
       <p className="text-red-700 mt-5">
         {showListingError ? "Error showing Listing" : ""}
       </p>
+
       {userListings?.length > 0 && (
-        <div className="flex flex-col gap-4">
+        <motion.div className="flex flex-col gap-4" variants={slideUp}>
           <h1 className="text-center my-7 text-2xl font-semibold">
             Your Listing
           </h1>
           {userListings.map((listing) => (
-            <div
+            <motion.div
               key={listing._id}
               className="border shadow-lg rounded-lg p-3 flex justify-between items-center gap-3"
+              initial="hidden"
+              animate="visible"
+              whileHover={{ scale: 1.02 }}
             >
               <Link to={`/listing/${listing._id}`}>
                 <img
@@ -304,11 +343,11 @@ const Profile = () => {
                   <button className="text-green-700 uppercase">Edit</button>
                 </Link>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

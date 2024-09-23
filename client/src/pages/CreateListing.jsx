@@ -3,9 +3,8 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { BeatLoader } from "react-spinners";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { app } from "../firebase";
-
-import toast from "react-hot-toast";
 
 import {
   getDownloadURL,
@@ -14,14 +13,16 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 
+import toast from "react-hot-toast";
+
 const CreateListing = () => {
-  // ============= Navigate =============
+  // ============= Navigation ================
   const navigate = useNavigate();
 
-  // ============= Redux =============
+  // ============= Redux ================
   const { currentUser } = useSelector((state) => state.user);
 
-  // ============= State =============
+  // ============= State ================
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,7 +33,7 @@ const CreateListing = () => {
     name: "",
     description: "",
     address: "",
-    type: "rent", // Default to 'rent'
+    type: "rent",
     bedrooms: 1,
     bathrooms: 1,
     regularPrice: 0,
@@ -42,14 +43,13 @@ const CreateListing = () => {
     furnished: false,
   });
 
-  // ================= Store Image =================
+  // ============= Image ================
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
       const fileName = new Date().getTime() + file.name;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, file);
-
       uploadTask.on(
         "state_changed",
         (snapshot) => {
@@ -64,7 +64,7 @@ const CreateListing = () => {
     });
   };
 
-  // ================= Submit Image Handler =================
+  // ============= Submit Function ================
   const submitImageHandler = async () => {
     setUploading(true);
     setImageUploadError(null);
@@ -88,7 +88,7 @@ const CreateListing = () => {
     }
   };
 
-  // ================= Remove Image Handler =================
+  // ============= Remove Function ================
   const removeImageHandler = (index) => {
     setFormData({
       ...formData,
@@ -96,19 +96,18 @@ const CreateListing = () => {
     });
   };
 
-  // ================= Change Handler =================
   const changeHandler = (event) => {
     const { id, value, checked, type } = event.target;
     const newValue = type === "checkbox" ? checked : value;
     setFormData({ ...formData, [id]: newValue });
   };
 
-  // ================= Submit Handler =================
+  // ============= Submit Function ================
   const submitHandler = async (event) => {
     event.preventDefault();
     try {
       if (formData.imageUrls.length < 1)
-        return setError("You must Upload at least one Image!");
+        return setError("You must upload at least one image!");
       if (+formData.regularPrice < +formData.discountPrice)
         return setError("Discount Price must be lower than Regular Price");
 
@@ -137,15 +136,28 @@ const CreateListing = () => {
     }
   };
 
-  // ================= Rendering =================
+  // ============= Rendering ================
   return (
-    <main className="mx-auto p-6 max-w-4xl shadow-lg rounded-lg my-10">
-      <h1 className="text-4xl font-bold text-center my-8 text-blue-600">
+    <motion.main
+      className="mx-auto p-6 max-w-4xl shadow-lg rounded-lg my-10"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+    >
+      <motion.h1
+        className="text-4xl font-bold text-center my-8 text-blue-600"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.6 }}
+      >
         Create a Listing
-      </h1>
-      <form
+      </motion.h1>
+      <motion.form
         className="flex flex-col gap-8 sm:flex-row"
         onSubmit={submitHandler}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.8 }}
       >
         <div className="flex-1 flex flex-col gap-6">
           <label className="block font-medium text-gray-700">Name</label>
@@ -305,7 +317,12 @@ const CreateListing = () => {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col gap-6">
+        <motion.div
+          className="flex-1 flex flex-col gap-6"
+          initial={{ opacity: 0, x: -100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+        >
           <p className="font-semibold text-gray-700">
             Images:
             <span className="font-normal text-gray-500 ml-2">
@@ -336,10 +353,13 @@ const CreateListing = () => {
               <div className="mt-4 grid grid-cols-3 gap-4">
                 {formData.imageUrls.map((url, index) => (
                   <div key={uuidv4()} className="flex flex-col items-center">
-                    <img
+                    <motion.img
                       src={url}
                       alt="listing"
                       className="w-20 h-20 object-cover rounded-lg"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5 }}
                     />
                     <button
                       type="button"
@@ -354,18 +374,20 @@ const CreateListing = () => {
             )}
           </div>
           <div className="text-center mt-8">
-            <button
+            <motion.button
               disabled={loading || uploading}
               type="submit"
               className="bg-blue-600 w-full text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               {loading ? <BeatLoader color="#a58080" /> : "Create Listing"}
-            </button>
+            </motion.button>
             {error && <p className="text-red-700 text-sm">{error}</p>}
           </div>
-        </div>
-      </form>
-    </main>
+        </motion.div>
+      </motion.form>
+    </motion.main>
   );
 };
 

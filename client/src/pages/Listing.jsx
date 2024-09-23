@@ -8,29 +8,30 @@ import { MoonLoader } from "react-spinners";
 import { Navigation } from "swiper/modules";
 import { GiPriceTag } from "react-icons/gi";
 import { useParams } from "react-router-dom";
-
 import SwiperCore from "swiper";
-
+import { motion } from "framer-motion"; // Import framer-motion
 import "swiper/css/bundle";
 import Contact from "../components/modules/Contact";
 
-const Listing = () => {
-  // ============ Redux ===============
-  const { currentUser } = useSelector((state) => state.user);
+// Enable Swiper's navigation module
 
-  // ============ Swiper ===============
+const Listing = () => {
+  // ================ Swiper ================
   SwiperCore.use([Navigation]);
 
-  // ============ State ===============
+  // ================ Redux ================
+  const { currentUser } = useSelector((state) => state.user);
+
+  // ================ State ================
   const [error, setError] = useState(false);
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [contact, setContact] = useState(false);
 
-  // ============ Params ===============
+  // ================ Params ================
   const { listingId } = useParams();
 
-  // ============ Effect ===============
+  // ================ Effect ================
   useEffect(() => {
     const fetchListing = async () => {
       try {
@@ -55,7 +56,19 @@ const Listing = () => {
     fetchListing();
   }, [listingId]);
 
-  // ============ Rendering ===============
+  // ================ Motion  ================
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
+  const slideUp = {
+    hidden: { y: 50, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
+
+  // ================ Rendering  ================
+  // Loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -64,6 +77,7 @@ const Listing = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="text-red-500 text-center mt-5">
@@ -72,6 +86,7 @@ const Listing = () => {
     );
   }
 
+  // No listing found
   if (!listing) {
     return (
       <div className="text-center mt-5">
@@ -81,33 +96,49 @@ const Listing = () => {
   }
 
   return (
-    <div className="container mx-auto p-5">
-      <div className="w-full mb-8">
+    <motion.div
+      className="container mx-auto p-5"
+      initial="hidden"
+      animate="visible"
+      transition={{ staggerChildren: 0.2 }}
+    >
+      {/* Swiper Section */}
+      <motion.div className="w-full mb-8" variants={fadeIn}>
         <Swiper navigation className="h-96" loop>
           {listing.imageUrls && listing.imageUrls.length > 0 ? (
             listing.imageUrls.map((url) => (
               <SwiperSlide key={uuidv4()}>
-                <img
+                <motion.img
                   src={url}
                   alt={`Image of listing ${listing.name}`}
                   className="w-full h-full object-contain mix-blend-multiply rounded-lg"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
                 />
               </SwiperSlide>
             ))
           ) : (
             <SwiperSlide>
-              <img
+              <motion.img
                 src="/path/to/placeholder.jpg"
                 alt="Placeholder"
                 className="w-full h-full object-cover mix-blend-multiply rounded-lg"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
               />
             </SwiperSlide>
           )}
         </Swiper>
-      </div>
+      </motion.div>
 
-      {/* Listing details */}
-      <div className="bg-white shadow-lg rounded-lg p-6">
+      {/* Listing Details Section */}
+      <motion.div
+        className="bg-white shadow-lg rounded-lg p-6"
+        variants={slideUp}
+        transition={{ duration: 0.8 }}
+      >
         <h1 className="text-4xl font-bold mb-4 text-gray-800">
           {listing.name}
         </h1>
@@ -157,16 +188,18 @@ const Listing = () => {
           </p>
         </div>
         {currentUser && listing.userRef !== currentUser._id && !contact && (
-          <button
+          <motion.button
             className="bg-slate-700 w-full my-4 text-white rounded-lg uppercase hover:opacity-95 p-3"
             onClick={() => setContact(true)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             Contact Landlord
-          </button>
+          </motion.button>
         )}
         {contact && <Contact listing={listing} />}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

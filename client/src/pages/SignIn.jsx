@@ -3,31 +3,33 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { BeatLoader } from "react-spinners";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 import toast from "react-hot-toast";
 import OAuth from "../components/modules/OAuth";
 
 const SignIn = () => {
-  // ============ Redux ============
+  // ============== redux ==============
   const { loading, error } = useSelector((state) => state.user);
 
-  // ============ Dispatch ============
+  // ============== Dispatch ==============
   const dispatch = useDispatch();
 
-  // ============ Navigate ============
+  // ============== Navigate ==============
   const navigate = useNavigate();
 
-  // ============ State ============
+  // ============== State ==============
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  // ============ Handlers ============
+  // ============== Change Function ==============
   const changeHandler = ({ target: { id, value } }) => {
     setFormData((prevState) => ({ ...prevState, [id]: value }));
   };
 
+  // ============== Submit Function ==============
   const submitHandler = async (event) => {
     event.preventDefault();
     dispatch(signInStart());
@@ -52,14 +54,33 @@ const SignIn = () => {
     }
   };
 
-  // ============ Rendering ============
+  // ============== Motion =============
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
+  // ============== Rendering ==============
   return (
-    <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center capitalize font-semibold my-7">
+    <motion.div
+      className="p-3 max-w-lg mx-auto"
+      initial="hidden"
+      animate="visible"
+      transition={{ staggerChildren: 0.2 }}
+    >
+      <motion.h1
+        className="text-3xl text-center capitalize font-semibold my-7"
+        variants={fadeIn}
+        transition={{ duration: 0.8 }}
+      >
         Sign In
-      </h1>
-      <form className="flex flex-col gap-4" onSubmit={submitHandler}>
-        <input
+      </motion.h1>
+      <motion.form
+        className="flex flex-col gap-4"
+        onSubmit={submitHandler}
+        variants={fadeIn}
+      >
+        <motion.input
           type="email"
           placeholder="Email..."
           className="border p-3 rounded-lg"
@@ -67,8 +88,9 @@ const SignIn = () => {
           value={formData.email}
           onChange={changeHandler}
           required
+          variants={fadeIn}
         />
-        <input
+        <motion.input
           type="password"
           placeholder="Password..."
           className="border p-3 rounded-lg"
@@ -76,27 +98,37 @@ const SignIn = () => {
           value={formData.password}
           onChange={changeHandler}
           required
+          variants={fadeIn}
         />
-        <button
+        <motion.button
           disabled={loading}
-          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80 w-full"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          variants={fadeIn}
         >
           {loading ? <BeatLoader color="#b18484" size={8} /> : "Sign In"}
-        </button>
-        <OAuth />
-        <div className="flex gap-2 mt-5">
+        </motion.button>
+        <motion.div variants={fadeIn}>
+          <OAuth />
+        </motion.div>
+        <motion.div className="flex gap-2 mt-5" variants={fadeIn}>
           <p>Don&apos;t have an account?</p>
           <Link to="/sign-up">
             <span className="text-blue-700">Sign Up</span>
           </Link>
-        </div>
+        </motion.div>
         {error && (
-          <p className="text-white mt-5 text-center bg-red-400 rounded-lg py-2">
+          <motion.p
+            className="text-white mt-5 text-center bg-red-400 rounded-lg py-2"
+            variants={fadeIn}
+            transition={{ duration: 0.5 }}
+          >
             {error}
-          </p>
+          </motion.p>
         )}
-      </form>
-    </div>
+      </motion.form>
+    </motion.div>
   );
 };
 

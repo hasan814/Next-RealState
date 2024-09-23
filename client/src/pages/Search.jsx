@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import { BeatLoader } from "react-spinners";
+import { motion } from "framer-motion"; // Import framer-motion
 
 import ListingItem from "../components/modules/ListingItem";
 
 const Search = () => {
-  // =============== Navigate ==============
+  // =============== Naviagte =============
   const navigate = useNavigate();
 
-  // =============== State ==============
+  // =============== State =============
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -23,7 +24,7 @@ const Search = () => {
     order: "desc",
   });
 
-  // =============== Change Function ==============
+  // =============== Change Function =============
   const changeHandler = (event) => {
     const { id, value, checked } = event.target;
 
@@ -46,7 +47,7 @@ const Search = () => {
     }
   };
 
-  // =============== Effect ==============
+  // =============== Effect =============
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm");
@@ -89,7 +90,7 @@ const Search = () => {
     fetchListings();
   }, [location.search]);
 
-  // =============== Submit Function ==============
+  // =============== Submit Function =============
   const submitHandler = async (event) => {
     event.preventDefault();
     const urlParams = new URLSearchParams();
@@ -104,7 +105,7 @@ const Search = () => {
     navigate(`/search?${searchQuery}`);
   };
 
-  // =============== Show Function ==============
+  // =============== Show Function =============
   const onShowMoreClick = async () => {
     const numberOfListings = listings.length;
     const startIndex = numberOfListings;
@@ -117,10 +118,29 @@ const Search = () => {
     setListings([...listings, ...responseData]);
   };
 
-  // =============== Rendering ==============
+  // =============== Motion =============
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
+  const slideUp = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
+
+  // =============== Rendering =============
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div className="p-7 border-b-2 md:border-r-2 md:min-h-screen md:col-span-1 bg-gray-50">
+    <motion.div
+      className="grid grid-cols-1 md:grid-cols-4 gap-4"
+      initial="hidden"
+      animate="visible"
+      transition={{ staggerChildren: 0.2 }}
+    >
+      <motion.div
+        className="p-7 border-b-2 md:border-r-2 md:min-h-screen md:col-span-1 bg-gray-50"
+        variants={fadeIn}
+      >
         <form onSubmit={submitHandler} className="flex flex-col gap-6">
           <div className="flex flex-col">
             <label htmlFor="searchTerm" className="mb-2 font-semibold">
@@ -233,12 +253,15 @@ const Search = () => {
               <option value={"createdAt_asc"}>Oldest</option>
             </select>
           </div>
-          <button className="bg-blue-600 text-white p-3 rounded-lg uppercase hover:bg-blue-700 transition duration-200">
+          <motion.button
+            className="bg-blue-600 text-white p-3 rounded-lg uppercase hover:bg-blue-700 transition duration-200"
+            whileHover={{ scale: 1.05 }}
+          >
             Search
-          </button>
+          </motion.button>
         </form>
-      </div>
-      <div className="md:col-span-3 p-7">
+      </motion.div>
+      <motion.div className="md:col-span-3 p-7" variants={fadeIn}>
         <h1 className="text-3xl font-semibold text-gray-800 border-b pb-3">
           Listing Results:
         </h1>
@@ -256,19 +279,22 @@ const Search = () => {
           {!loading &&
             listings &&
             listings.map((listing) => (
-              <ListingItem key={uuidv4()} listing={listing} />
+              <motion.div key={uuidv4()} variants={slideUp}>
+                <ListingItem listing={listing} />
+              </motion.div>
             ))}
           {showMore && (
-            <button
+            <motion.button
               onClick={onShowMoreClick}
               className="text-green-700 hover:underline p-7 w-full text-center"
+              whileHover={{ scale: 1.05 }}
             >
               Show More
-            </button>
+            </motion.button>
           )}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

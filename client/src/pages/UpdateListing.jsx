@@ -1,8 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useSelector } from "react-redux";
 import { BeatLoader } from "react-spinners";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { app } from "../firebase";
 
 import toast from "react-hot-toast";
@@ -15,16 +16,16 @@ import {
 } from "firebase/storage";
 
 const UpdateListing = () => {
-  // ============= Params =============
+  // ================ Params ==============
   const params = useParams();
 
-  // ============= Navigate =============
+  // ================ Navigate ==============
   const navigate = useNavigate();
 
-  // ============= Redux =============
+  // ================ Redux ==============
   const { currentUser } = useSelector((state) => state.user);
 
-  // ============= State =============
+  // ================ State =============
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,7 +36,7 @@ const UpdateListing = () => {
     name: "",
     description: "",
     address: "",
-    type: "rent", // Default to 'rent'
+    type: "rent",
     bedrooms: 1,
     bathrooms: 1,
     regularPrice: 0,
@@ -45,7 +46,7 @@ const UpdateListing = () => {
     furnished: false,
   });
 
-  // ================= Store Image =================
+  // ================ Store Image ==============
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
@@ -67,7 +68,7 @@ const UpdateListing = () => {
     });
   };
 
-  // ================= Submit Image Handler =================
+  // ================ Submit Function ==============
   const submitImageHandler = async () => {
     setUploading(true);
     setImageUploadError(null);
@@ -91,7 +92,7 @@ const UpdateListing = () => {
     }
   };
 
-  // ================= Remove Image Handler =================
+  // ================ Remove Function ==============
   const removeImageHandler = (index) => {
     setFormData({
       ...formData,
@@ -99,14 +100,14 @@ const UpdateListing = () => {
     });
   };
 
-  // ================= Change Handler =================
+  // ================ Change Function ==============
   const changeHandler = (event) => {
     const { id, value, checked, type } = event.target;
     const newValue = type === "checkbox" ? checked : value;
     setFormData({ ...formData, [id]: newValue });
   };
 
-  // ================= Submit Handler =================
+  // ================ Submit Function ==============
   const submitHandler = async (event) => {
     event.preventDefault();
     try {
@@ -131,12 +132,12 @@ const UpdateListing = () => {
       navigate(`/listing/${responseData.updatedListing._id}`);
     } catch (error) {
       console.log(error);
-      setError("An error occurred while upadting the listing.");
+      setError("An error occurred while updating the listing.");
       setLoading(false);
     }
   };
 
-  // ================= Effect =================
+  // ================ Effect ==============
   useEffect(() => {
     const fetchData = async () => {
       const listingId = params.listingId;
@@ -151,51 +152,69 @@ const UpdateListing = () => {
     fetchData();
   }, [params.listingId]);
 
-  // ================= Rendering =================
+  // ================ Motion ==============
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
+  // ================ Store Image ==============
   return (
-    <main className="mx-auto p-6 max-w-4xl shadow-lg rounded-lg my-10">
-      <h1 className="text-4xl font-bold text-center my-8 text-blue-600">
+    <motion.main
+      className="mx-auto p-6 max-w-4xl shadow-lg rounded-lg my-10"
+      initial="hidden"
+      animate="visible"
+      transition={{ staggerChildren: 0.3 }}
+    >
+      <motion.h1
+        className="text-4xl font-bold text-center my-8 text-blue-600"
+        variants={fadeIn}
+        transition={{ duration: 0.8 }}
+      >
         Update a Listing
-      </h1>
-      <form
+      </motion.h1>
+      <motion.form
         onSubmit={submitHandler}
         className="flex flex-col gap-8 sm:flex-row"
+        variants={fadeIn}
       >
         <div className="flex-1 flex flex-col gap-6">
           <label className="block font-medium text-gray-700">Name</label>
-          <input
+          <motion.input
             id="name"
             type="text"
             value={formData.name}
             onChange={changeHandler}
             placeholder="Name of Listing"
             className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            variants={fadeIn}
           />
           <label className="block font-medium text-gray-700">Description</label>
-          <textarea
+          <motion.textarea
             id="description"
             rows="4"
             onChange={changeHandler}
             value={formData.description}
             placeholder="Description of Listing"
             className="border border-gray-300 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            variants={fadeIn}
           />
           <label className="block font-medium text-gray-700">Address</label>
-          <input
+          <motion.input
             type="text"
             id="address"
             placeholder="Address"
             value={formData.address}
             onChange={changeHandler}
             className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            variants={fadeIn}
           />
-
           <label className="block font-medium text-gray-700">
             Property Type
           </label>
           <div className="flex flex-wrap gap-3">
             <label className="flex items-center gap-2">
-              <input
+              <motion.input
                 id="type"
                 name="type"
                 type="radio"
@@ -203,11 +222,12 @@ const UpdateListing = () => {
                 onChange={changeHandler}
                 checked={formData.type === "sell"}
                 className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                variants={fadeIn}
               />
               <span>Sell</span>
             </label>
             <label className="flex items-center gap-2">
-              <input
+              <motion.input
                 id="type"
                 name="type"
                 type="radio"
@@ -215,111 +235,25 @@ const UpdateListing = () => {
                 onChange={changeHandler}
                 checked={formData.type === "rent"}
                 className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                variants={fadeIn}
               />
               <span>Rent</span>
             </label>
             <label className="flex items-center gap-2">
-              <input
+              <motion.input
                 id="offer"
                 type="checkbox"
                 onChange={changeHandler}
                 checked={formData.offer}
                 className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                variants={fadeIn}
               />
               <span>Offer</span>
             </label>
-            <label className="flex items-center gap-2">
-              <input
-                id="parking"
-                type="checkbox"
-                onChange={changeHandler}
-                checked={formData.parking}
-                className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500"
-              />
-              <span>Parking Spot</span>
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input
-                id="furnished"
-                type="checkbox"
-                onChange={changeHandler}
-                checked={formData.furnished}
-                className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500"
-              />
-              <span>Furnished</span>
-            </label>
-          </div>
-
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="block font-medium text-gray-700">
-                Bedrooms
-              </label>
-              <input
-                max="10"
-                min="1"
-                id="bedrooms"
-                type="number"
-                placeholder="Bedrooms"
-                value={formData.bedrooms}
-                onChange={changeHandler}
-                className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block font-medium text-gray-700">
-                Bathrooms
-              </label>
-              <input
-                max="10"
-                min="1"
-                type="number"
-                id="bathrooms"
-                placeholder="Bathrooms"
-                onChange={changeHandler}
-                value={formData.bathrooms}
-                className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block font-medium text-gray-700">
-                <div className="flex flex-col items-center">
-                  Regular Price <span className="text-sm">($/month)</span>
-                </div>
-              </label>
-              <input
-                type="number"
-                id="regularPrice"
-                onChange={changeHandler}
-                placeholder="Regular Price"
-                value={formData.regularPrice}
-                className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              {formData.offer && (
-                <>
-                  <label className="block font-medium text-gray-700">
-                    <div className="flex flex-col items-center">
-                      Discount Price <span className="text-sm">($/month)</span>
-                    </div>
-                  </label>
-                  <input
-                    type="number"
-                    id="discountPrice"
-                    onChange={changeHandler}
-                    placeholder="Discount Price"
-                    value={formData.discountPrice}
-                    className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </>
-              )}
-            </div>
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col gap-6">
+        <motion.div className="flex-1 flex flex-col gap-6" variants={fadeIn}>
           <p className="font-semibold text-gray-700">
             Images:
             <span className="font-normal text-gray-500 ml-2">
@@ -349,7 +283,11 @@ const UpdateListing = () => {
             {formData.imageUrls.length > 0 && (
               <div className="mt-4 grid grid-cols-3 gap-4">
                 {formData.imageUrls.map((url, index) => (
-                  <div key={uuidv4()} className="flex flex-col items-center">
+                  <motion.div
+                    key={uuidv4()}
+                    className="flex flex-col items-center"
+                    whileHover={{ scale: 1.05 }}
+                  >
                     <img
                       src={url}
                       alt="listing"
@@ -362,24 +300,26 @@ const UpdateListing = () => {
                     >
                       Delete
                     </button>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}
           </div>
           <div className="text-center mt-8">
-            <button
+            <motion.button
               type="submit"
               disabled={loading || uploading}
               className="bg-blue-600 w-full text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+              whileHover={{ scale: 1.05 }}
+              variants={fadeIn}
             >
               {loading ? <BeatLoader color="#a58080" /> : "Update Listing"}
-            </button>
+            </motion.button>
             {error && <p className="text-red-700 text-sm">{error}</p>}
           </div>
-        </div>
-      </form>
-    </main>
+        </motion.div>
+      </motion.form>
+    </motion.main>
   );
 };
 

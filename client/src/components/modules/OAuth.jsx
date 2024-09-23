@@ -55,7 +55,7 @@ const OAuth = () => {
         type="button"
         onClick={googleHandler}
         disabled={loading}
-        className="flex items-center gap-5 justify-center p-3 my-2 bg-red-500 rounded-lg uppercase hover:bg-red-400 disabled:opacity-80"
+        className="flex w-full items-center gap-5 justify-center p-3 my-2 bg-red-500 rounded-lg uppercase hover:bg-red-400 disabled:opacity-80"
       >
         {loading ? (
           "Loading..."

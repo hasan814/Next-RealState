@@ -1,9 +1,11 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useEffect, useState } from "react";
 import { Navigation } from "swiper/modules";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 import ListingItem from "../components/modules/ListingItem";
+
 import "swiper/css/navigation";
 import "swiper/css";
 
@@ -38,11 +40,31 @@ const Home = () => {
     fetchOfferListings();
   }, []);
 
+  // ============== Animation Variants =============
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
   // ============== Rendering =============
   return (
-    <div className="max-w-screen-xl mx-auto p-4">
+    <motion.div
+      className="max-w-screen-xl mx-auto p-4"
+      initial="hidden"
+      animate="visible"
+      transition={{ staggerChildren: 0.3 }}
+    >
       {/* Top Section */}
-      <div className="text-center py-10">
+      <motion.div
+        className="text-center py-10"
+        variants={fadeInUp}
+        transition={{ duration: 0.8 }}
+      >
         <h1 className="text-4xl font-bold text-gray-800 mb-4">
           Find Your Next <span className="text-blue-600">Perfect</span> Place
           with Ease
@@ -51,17 +73,23 @@ const Home = () => {
           Real Estate is the best place to find your next home. <br />
           We have a wide range of properties for you to choose from.
         </p>
-        <Link
-          to="/search"
-          className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Let&apos;s get Started...
-        </Link>
-      </div>
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Link
+            to="/search"
+            className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Let&apos;s get Started...
+          </Link>
+        </motion.div>
+      </motion.div>
 
       {/* Swiper Section */}
       {offerListings && offerListings.length > 0 && (
-        <div className="my-10">
+        <motion.div
+          className="my-10"
+          variants={fadeIn}
+          transition={{ duration: 0.8 }}
+        >
           <Swiper
             navigation
             modules={[Navigation]}
@@ -71,7 +99,7 @@ const Home = () => {
             {offerListings.map((listing) => (
               <SwiperSlide key={listing._id}>
                 <Link to={`/listing/${listing._id}`}>
-                  <div
+                  <motion.div
                     style={{
                       backgroundImage: `url(${listing.imageUrls[0]})`,
                       backgroundPosition: "center",
@@ -79,19 +107,27 @@ const Home = () => {
                       backgroundSize: "cover",
                     }}
                     className="h-[500px] rounded-lg shadow-lg transition-transform hover:scale-105"
-                  ></div>
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  ></motion.div>
                 </Link>
               </SwiperSlide>
             ))}
           </Swiper>
-        </div>
+        </motion.div>
       )}
 
       {/* Listings Section */}
-      <div className="flex flex-col gap-12 my-10">
+      <motion.div
+        className="flex flex-col gap-12 my-10"
+        initial="hidden"
+        animate="visible"
+        variants={fadeInUp}
+        transition={{ staggerChildren: 0.3 }}
+      >
         {/* Offer Listings */}
         {offerListings && offerListings.length > 0 && (
-          <div>
+          <motion.div variants={fadeInUp} transition={{ duration: 0.8 }}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold">Recent Offers</h2>
               <Link
@@ -106,12 +142,12 @@ const Home = () => {
                 <ListingItem listing={listing} key={listing._id} />
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Rent Listings */}
         {rentListings && rentListings.length > 0 && (
-          <div>
+          <motion.div variants={fadeInUp} transition={{ duration: 0.8 }}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold">Recent Places for Rent</h2>
               <Link
@@ -126,12 +162,12 @@ const Home = () => {
                 <ListingItem listing={listing} key={listing._id} />
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Sale Listings */}
         {saleListings && saleListings.length > 0 && (
-          <div>
+          <motion.div variants={fadeInUp} transition={{ duration: 0.8 }}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold">Recent Places for Sale</h2>
               <Link
@@ -146,10 +182,10 @@ const Home = () => {
                 <ListingItem listing={listing} key={listing._id} />
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

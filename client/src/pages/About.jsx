@@ -1,16 +1,40 @@
+
+import { motion } from "framer-motion";
+
 const About = () => {
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg my-10">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">
+    <motion.div
+      className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg my-10"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
+      <motion.h1
+        className="text-3xl font-bold text-gray-800 mb-6"
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
         About Real Estate
-      </h1>
-      <p className="text-lg text-gray-700 leading-relaxed">
+      </motion.h1>
+
+      <motion.p
+        className="text-lg text-gray-700 leading-relaxed"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
         Real estate refers to property consisting of land and any permanent
         structures on it, such as buildings, homes, or improvements. It is
         commonly divided into several categories:
-      </p>
+      </motion.p>
 
-      <ul className="list-disc list-inside my-4 text-gray-700">
+      <motion.ul
+        className="list-disc list-inside my-4 text-gray-700"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      >
         <li>
           <strong>Residential Real Estate:</strong> Property intended for people
           to live in, such as houses, apartments, and condominiums. This is the
@@ -35,14 +59,19 @@ const About = () => {
           <strong>Special Purpose Real Estate:</strong> Properties designed for
           specific uses, like schools, hospitals, and government buildings.
         </li>
-      </ul>
+      </motion.ul>
 
-      <p className="text-lg text-gray-700 leading-relaxed">
+      <motion.p
+        className="text-lg text-gray-700 leading-relaxed"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+      >
         Real estate can be owned, bought, sold, rented, or developed. It is an
         important asset in most economies and plays a critical role in
         investment, business, and personal finance.
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 };
 
