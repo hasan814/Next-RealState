@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import express from "express";
 import cookieParse from "cookie-parser";
+import path from "path";
 
 import dotenv from "dotenv";
 
@@ -19,6 +20,8 @@ mongoose
     console.log(err);
   });
 
+const __dirname = path.resolve();
+
 const app = express();
 
 app.listen(3000, () => {
@@ -31,6 +34,12 @@ app.use(cookieParse());
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
+
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__direname, "client", "dist", "index.html"));
+});
 
 app.use((err, req, res, next) => {
   const statusCode = err.message || 500;
